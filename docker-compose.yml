@@ -1,0 +1,53 @@
+---
+version: "3.7"
+
+services:
+
+  proxy:
+    image: library/nginx:1.19.0-alpine
+    ports:
+      - 80:80
+    container_name: proxy
+    hostname: proxy
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+
+  backend-dev:
+    build:
+      context: .
+      dockerfile: docker/backend/dev/Dockerfile
+    container_name: backend-dev
+    hostname: backend-dev
+    ports:
+      - 8080:8080
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env.local
+
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: docker/frontend/dev/Dockerfile
+    container_name: frontend-dev
+    hostname: frontend-dev
+    ports:
+      - 3000:3000
+    volumes:
+      - /app/node_modules
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    env_file:
+      - .env.local
+
+  database-local:
+    image: postgres:11
+    container_name: database-local
+    hostname: database-local
+    environment:
+      - POSTGRES_USER=sample
+      - POSTGRES_PASSWORD=s4mPL3db
+      - POSTGRES_DB=sample
+    ports:
+      - 5432:5432
