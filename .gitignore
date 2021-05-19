@@ -12,7 +12,7 @@ node_modules/
 /coverage
 
 # production
-/docker
+# /docker
 
 # misc
 .DS_Store
